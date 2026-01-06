@@ -28,7 +28,7 @@ jobs:
       run: mvn -B clean --file pom.xml
   compile:
     runs-on: ubuntu-latest
-    # needs: setup
+    needs: setup
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -37,8 +37,38 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: setup
+    - name: compile
       run: mvn -B compile --file pom.xml
+  unittesting:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      packages: write
+    needs: compile
+    steps:
+    - run: echo should run unit test
+    - uses: actions/checkout@v4
+    - name: Maven test
+      run: mvn -B test --file pom.xml
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      with:
+        files: target/surefire-reports/*.xml
+  codecoverage:
+    runs-on: ubuntu-latest
+    needs: unittesting
+    permissions:
+      contents: read
+      checks: write
+      packages: write
+    steps:
+    - run: echo should run cc
+    - uses: actions/checkout@v4
+    - name: Maven test
+      run: mvn -X org.jacoco:jacoco-maven-plugin:report
+      
+    
     
 
   # build:
