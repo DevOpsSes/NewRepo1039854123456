@@ -80,6 +80,12 @@ jobs:
         cache: maven
     - name: maven war
       run: mvn -X war:war 
+    - name: upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: webapp
+        path: target/*.war
+      
     
     
 
